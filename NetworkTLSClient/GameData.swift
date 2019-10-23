@@ -67,7 +67,7 @@ class WaitingForPlayers : GameState {
         
         // This should never happen
         guard gameData.playerNames.count < gameData.maxPlayers else {
-            return WaitingForMove()
+            return WaitingOnMove()
         }
         
         // Add the player and check for max players
@@ -76,7 +76,7 @@ class WaitingForPlayers : GameState {
         
         // Update the game state if necessary
         if gameData.playerNames.count >= gameData.maxPlayers {
-            return WaitingForMove()
+            return WaitingOnMove()
         }
         
         // Still waiting for more players
@@ -102,7 +102,7 @@ class WaitingForPlayers : GameState {
     
 }
 
-class WaitingForMove : GameState {
+class WaitingOnMove : GameState {
     func addPlayer(gameData: GameData, playerID: UInt8, playerName: String) -> GameState {
         return self
     }
@@ -152,7 +152,22 @@ class WaitingForMove : GameState {
 
 class GameOver : GameState {
     func addPlayer(gameData: GameData, playerID: UInt8, playerName: String) -> GameState {
-        // TODO: Restart implementation
+        // Restart implementation
+        gameData.restartIDs.insert(playerID)
+        
+        // Check if all players have agreed to restart
+        if gameData.restartIDs.count == gameData.playerIDs.count {
+            // Reset game data
+            gameData.restartIDs.removeAll()
+            gameData.gameBoard.removeAll()
+            
+            // Leave active player - previous games' loser
+            
+            // Restart the game
+            return WaitingOnMove()
+        }
+        
+        // Still waiting for all player to restart
         return self
     }
     
