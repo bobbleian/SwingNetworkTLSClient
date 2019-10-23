@@ -168,9 +168,29 @@ func printGamePrompt() {
             print("Game Players", terminator: ":")
             print(gameData.playerNames)
             print("Board Size: \(gameData.gameBoardSize)")
+            
+            // Print game status
+            if gameData.isGameOver() {
+                if gameData.activePlayer == userID {
+                    print("Status: Game Over - You have lost...")
+                } else {
+                    print("Status: Game Over - You have WON!!!")
+                }
+                print("Play again (yes/no)?", terminator: " > ")
+            } else {
+                if gameData.activePlayer == userID {
+                    print("Enter next move (1,2,3)", terminator: " > ")
+                } else {
+                    print("Status: Waiting for other player to move")
+                    print("", terminator: "> ")
+                }
+            }
+        } else {
+            print("Status: Waiting for opponent", terminator: " > ")
         }
     } else {
         print("Please enter user name")
+        print("", terminator: "> ")
     }
     updateUserPrompt = false
 }
@@ -211,6 +231,7 @@ connection.stateUpdateHandler = { newState in
 connection.start(queue: DispatchQueue(label: "tls"))
 
 while (true) {
+    updateUserPrompt = true
     printGamePrompt()
     let response = readLine()
     if let response = response {
