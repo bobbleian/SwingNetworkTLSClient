@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D4993A42360C52A0032B9CF /* GameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4993A32360C52A0032B9CF /* GameData.swift */; };
 		3D4A83F6235B808500BCF448 /* GameProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D4A83F5235B808500BCF448 /* GameProtocol.swift */; };
 		3DFD7231235A327800340D12 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFD7230235A327800340D12 /* main.swift */; };
 /* End PBXBuildFile section */
@@ -24,6 +25,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3D4993A32360C52A0032B9CF /* GameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameData.swift; sourceTree = "<group>"; };
 		3D4A83F5235B808500BCF448 /* GameProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameProtocol.swift; sourceTree = "<group>"; };
 		3DFD722D235A327800340D12 /* NetworkTLSClient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetworkTLSClient; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DFD7230235A327800340D12 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -61,6 +63,7 @@
 			children = (
 				3DFD7230235A327800340D12 /* main.swift */,
 				3D4A83F5235B808500BCF448 /* GameProtocol.swift */,
+				3D4993A32360C52A0032B9CF /* GameData.swift */,
 			);
 			path = NetworkTLSClient;
 			sourceTree = "<group>";
@@ -124,6 +127,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DFD7231235A327800340D12 /* main.swift in Sources */,
+				3D4993A42360C52A0032B9CF /* GameData.swift in Sources */,
 				3D4A83F6235B808500BCF448 /* GameProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -181,7 +185,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -235,7 +239,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;

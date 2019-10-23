@@ -11,8 +11,11 @@ import Network
 // Define the types of commands your game will use.
 enum GameMessageType: UInt8 {
     case USER_NAME = 0
+    case PLAYER_MOVE = 1
     case GAME_DATA = 4
     case ADD_PLAYER = 5
+    case MOVE_PLAYER = 6
+    case SET_ACTIVE_PLAYER = 7
     case SERVER_WELCOME = 8
     case UNKNOWN = 255
 }

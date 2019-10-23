@@ -25,6 +25,12 @@ extension Data {
     }
 }
 
+// Game State data
+var updateUserPrompt: Bool = true
+var userName: String? = nil
+var userID: UInt8 = 255
+var gameData: GameData? = nil
+
 // Receive a message, deliver it to your delegate, and continue receiving more messages.
 func receiveNextMessage(connection: NWConnection) {
     connection.receiveMessage { (content, context, isComplete, error) in
@@ -47,8 +53,8 @@ func receivedMessage(content: Data?, message: NWProtocolFramer.Message) {
     case .USER_NAME:
         print("Received user name message")
     case .SERVER_WELCOME:
-        let playerID = content[0];
-        print("Server Welcome Message: playerID=\(playerID)")
+        userID = content[0];
+        print("Server Welcome Message: playerID=\(userID)")
 
     case .ADD_PLAYER:
         /*
@@ -59,6 +65,22 @@ func receivedMessage(content: Data?, message: NWProtocolFramer.Message) {
         let playerID = content[0];
         let playerName = String(decoding: content.subdata(in: 1..<content.count), as: UTF8.self)
         print("Add Player Message: playerID=\(playerID); playerName=\(playerName)")
+        
+        if let gameData = gameData {
+            gameData.addPlayer(playerID: playerID, playerName: playerName)
+        }
+        
+    case .SET_ACTIVE_PLAYER:
+        /*
+         SET ACTIVE PLAYER Message
+         - content[0]: playerID
+         */
+        let playerID = content[0];
+        print("Set Active Player Message: playerID=\(playerID)")
+        
+        if let gameData = gameData {
+            gameData.setActivePlayer(playerID: playerID)
+        }
 
     case .GAME_DATA:
         /*
@@ -67,16 +89,33 @@ func receivedMessage(content: Data?, message: NWProtocolFramer.Message) {
          - maxMove (uint8)
          - gameBoardSize (uint8)
          */
-        let maxPlayers = content[0];
-        let maxMove = content[1];
-        let gameBoardSize = content[2];
-        print("Game Data Message: maxPlayers=\(maxPlayers); maxMove=\(maxMove); gameBoardSize=\(gameBoardSize)")
+        let gameDataMaxPlayers = content[0];
+        let gameDataMaxMove = content[1];
+        let gameDataGameBoardSize = content[2];
+        print("Game Data Message: maxPlayers=\(gameDataMaxPlayers); maxMove=\(gameDataMaxMove); gameBoardSize=\(gameDataGameBoardSize)")
+        
+        gameData = GameData(maxPlayers: gameDataMaxPlayers, maxMove: gameDataMaxMove, gameBoardSize: gameDataGameBoardSize)
+    case .MOVE_PLAYER:
+        /*
+         MOVE PLAYER Message
+         - content[0]: playerID
+         - content[1]: playerMove
+         */
+        let playerID = content[0];
+        let playerMove = content[1];
+        print("Move Player Message: playerID=\(playerID), playerMove=\(playerMove)")
+        
+        if let gameData = gameData {
+            gameData.movePlayer(playerID: playerID, playerMove: playerMove)
+        }
     default:
         print("Unknown message type")
     }
+    updateUserPrompt = true
+    printGamePrompt()
 }
 
-// Handle sending a "move" message.
+// Handle sending a "User Name" message.
 func sendUserName(_ userName: String, connection: NWConnection?) {
     guard let connection = connection else {
         return
@@ -91,7 +130,50 @@ func sendUserName(_ userName: String, connection: NWConnection?) {
     connection.send(content: userName.data(using: .utf8), contentContext: context, isComplete: true, completion: .idempotent)
 }
 
-print("Hello, World!")
+// Handle sending a "Player Move" message.
+func sendPlayerMove(_ playerMove: UInt8, connection: NWConnection?) {
+    guard let connection = connection else {
+        return
+    }
+
+    // Create a message object to hold the command type.
+    let message = NWProtocolFramer.Message(gameMessageType: .PLAYER_MOVE)
+    let context = NWConnection.ContentContext(identifier: "Player Move",
+                                              metadata: [message])
+    
+    var content = Data()
+    content.append(playerMove)
+
+    // Send the application content along with the message.
+    connection.send(content: content, contentContext: context, isComplete: true, completion: .idempotent)
+}
+
+func printGamePrompt() {
+    guard (updateUserPrompt) else {
+        return
+    }
+    for _ in 0..<100 {
+        print("")
+    }
+    
+    if let userName = userName {
+        print("Player: \(userName)")
+        
+        if let gameData = gameData {
+            print("Active Player: \(gameData.activePlayer)")
+            print("Max Move: \(gameData.maxMove)")
+            print("Game Board", terminator: ":")
+            print(gameData.gameBoard)
+            print("Game Total: \(gameData.gameBoard.count)")
+            print("Game Players", terminator: ":")
+            print(gameData.playerNames)
+            print("Board Size: \(gameData.gameBoardSize)")
+        }
+    } else {
+        print("Please enter user name")
+    }
+    updateUserPrompt = false
+}
 
 let tcpOptions = NWProtocolTCP.Options()
 tcpOptions.enableKeepalive = true
@@ -129,11 +211,27 @@ connection.stateUpdateHandler = { newState in
 connection.start(queue: DispatchQueue(label: "tls"))
 
 while (true) {
+    printGamePrompt()
     let response = readLine()
     if let response = response {
-        print("Send User Name: \(response)")
-        sendUserName(response, connection: connection)
+        if userName == nil {
+            userName = response
+            sendUserName(response, connection: connection)
+            updateUserPrompt = true
+        } else if let gameData = gameData {
+            if gameData.isGameOver() {
+                // TODO implement restart game/quit game logic
+            } else {
+                // Parse player move
+                if let playerMove = UInt8(response) {
+                    sendPlayerMove(playerMove, connection: connection)
+                }
+                
+            }
+        }
+
     }
+    
     /*
     print("\(connection)")
     print("\(connection.state)")
